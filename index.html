@@ -22,7 +22,6 @@
       --concrete2: #23232a;
       --text: #f3f3f3;
       --muted: #a7a7b0;
-      --warning: #d9d9d9;
     }
 
     html, body {
@@ -49,6 +48,7 @@
       width: 100%;
       max-width: 390px;
       text-align: center;
+      position: relative;
     }
 
     h1 {
@@ -140,6 +140,7 @@
       justify-content: center;
       align-items: center;
       margin: 0 auto;
+      position: relative;
     }
 
     canvas {
@@ -233,6 +234,211 @@
       line-height: 1.4;
     }
 
+    .ending-overlay {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,0.04), rgba(0,0,0,0.75) 45%, rgba(0,0,0,0.93) 100%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 50;
+    }
+
+    .ending-overlay.show {
+      display: flex;
+      animation: fadeIn 0.8s ease;
+    }
+
+    .ending-card {
+      width: 100%;
+      max-width: 390px;
+      border-radius: 24px;
+      padding: 18px 16px 16px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #44444e;
+      background:
+        repeating-linear-gradient(
+          135deg,
+          rgba(255,255,255,0.018) 0px,
+          rgba(255,255,255,0.018) 4px,
+          rgba(0,0,0,0.018) 4px,
+          rgba(0,0,0,0.018) 10px
+        ),
+        linear-gradient(180deg, #1c1c22, #101015);
+      box-shadow:
+        0 20px 50px rgba(0,0,0,0.5),
+        inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+
+    .ending-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 50% 20%, rgba(255,255,255,0.06), transparent 22%),
+        radial-gradient(circle at 20% 78%, rgba(255,255,255,0.025), transparent 18%),
+        radial-gradient(circle at 78% 72%, rgba(255,255,255,0.02), transparent 18%);
+      opacity: 0.9;
+    }
+
+    .ending-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    }
+
+    .ending-sub {
+      color: #ccccd3;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .ending-scene {
+      position: relative;
+      height: 280px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid #4a4a53;
+      background:
+        linear-gradient(180deg, #1f1f26 0%, #141419 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.03),
+        inset 0 -40px 70px rgba(0,0,0,0.35);
+      margin-bottom: 14px;
+    }
+
+    .dust {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      filter: blur(6px);
+      animation: floatDust linear infinite;
+    }
+
+    .brick {
+      position: absolute;
+      width: 34px;
+      height: 18px;
+      border-radius: 4px;
+      background:
+        linear-gradient(180deg, #8c8c92, #68686f);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 4px 10px rgba(0,0,0,0.3);
+      opacity: 0;
+      animation: brickRise 1s forwards;
+    }
+
+    .statue-placeholder {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) scale(0.9);
+      width: 120px;
+      height: 190px;
+      opacity: 0;
+      animation: revealStatue 1.6s forwards 1.1s;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.4));
+    }
+
+    .pedestal {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 24px;
+      border-radius: 6px 6px 10px 10px;
+      background: linear-gradient(180deg, #8b8b92, #5d5d65);
+    }
+
+    .body-shape {
+      position: absolute;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      width: 82px;
+      height: 150px;
+      background: linear-gradient(180deg, #d4d4d8, #8f8f95 70%, #77777f);
+      clip-path: polygon(
+        48% 0%, 60% 5%, 68% 16%, 66% 28%, 72% 36%, 74% 49%,
+        67% 61%, 67% 77%, 74% 100%, 57% 100%, 50% 82%, 43% 100%,
+        26% 100%, 34% 77%, 33% 61%, 26% 49%, 28% 36%, 34% 28%,
+        32% 16%, 40% 5%
+      );
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+
+    .crack-line {
+      position: absolute;
+      background: rgba(60,60,68,0.55);
+      border-radius: 4px;
+    }
+
+    .ending-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .ending-note {
+      margin-top: 12px;
+      color: #bcbcc4;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes floatDust {
+      from {
+        transform: translateY(16px) translateX(0px);
+        opacity: 0;
+      }
+      20% { opacity: 0.8; }
+      to {
+        transform: translateY(-120px) translateX(18px);
+        opacity: 0;
+      }
+    }
+
+    @keyframes brickRise {
+      0% {
+        transform: translateY(30px) scale(0.8) rotate(8deg);
+        opacity: 0;
+      }
+      60% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes revealStatue {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.86);
+      }
+      60% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+      }
+    }
+
     @media (max-height: 740px) {
       h1 {
         font-size: 25px;
@@ -261,6 +467,10 @@
       .help {
         font-size: 11px;
         margin-top: 8px;
+      }
+
+      .ending-scene {
+        height: 250px;
       }
     }
   </style>
@@ -309,6 +519,47 @@
     </div>
   </div>
 
+  <div class="ending-overlay" id="endingOverlay">
+    <div class="ending-card">
+      <div class="ending-title">ไซต์สุดท้ายถูกพิชิตแล้ว</div>
+      <div class="ending-sub">
+        เศษอิฐและฝุ่นจากสนามสุดท้ายกำลังก่อตัวเป็นผลงานปลายทางของผู้ชนะ
+      </div>
+
+      <div class="ending-scene" id="endingScene">
+        <div class="brick" style="left:18%; bottom:38px; animation-delay:0.1s;"></div>
+        <div class="brick" style="left:28%; bottom:60px; animation-delay:0.2s;"></div>
+        <div class="brick" style="left:38%; bottom:84px; animation-delay:0.35s;"></div>
+        <div class="brick" style="left:50%; bottom:108px; animation-delay:0.5s;"></div>
+        <div class="brick" style="left:61%; bottom:84px; animation-delay:0.7s;"></div>
+        <div class="brick" style="left:69%; bottom:58px; animation-delay:0.9s;"></div>
+
+        <div class="dust" style="width:46px;height:46px;left:18%;bottom:30px;animation-duration:4s;animation-delay:0.2s;"></div>
+        <div class="dust" style="width:30px;height:30px;left:28%;bottom:70px;animation-duration:3.5s;animation-delay:0.9s;"></div>
+        <div class="dust" style="width:38px;height:38px;left:58%;bottom:50px;animation-duration:4.2s;animation-delay:0.6s;"></div>
+        <div class="dust" style="width:24px;height:24px;left:72%;bottom:92px;animation-duration:3.2s;animation-delay:1.1s;"></div>
+        <div class="dust" style="width:34px;height:34px;left:44%;bottom:120px;animation-duration:3.7s;animation-delay:1.4s;"></div>
+
+        <div class="statue-placeholder">
+          <div class="body-shape"></div>
+          <div class="pedestal"></div>
+          <div class="crack-line" style="left:50%; top:36px; width:3px; height:90px; transform:rotate(8deg);"></div>
+          <div class="crack-line" style="left:40%; top:88px; width:26px; height:3px; transform:rotate(-24deg);"></div>
+          <div class="crack-line" style="left:57%; top:104px; width:22px; height:3px; transform:rotate(28deg);"></div>
+        </div>
+      </div>
+
+      <div class="ending-actions">
+        <button id="replayEndingBtn">ดูฉากจบอีกครั้ง</button>
+        <button id="restartFromEndingBtn">เริ่มใหม่</button>
+      </div>
+
+      <div class="ending-note">
+        ตอนนี้เป็นฉากจบต้นแบบก่อน ขั้นถัดไปเราค่อยเลือกว่าจะเปลี่ยนเป็นประติมากรรมแบบใด
+      </div>
+    </div>
+  </div>
+
   <script>
     const canvas = document.getElementById("game");
     const ctx = canvas.getContext("2d");
@@ -318,6 +569,9 @@
     const linesEl = document.getElementById("lines");
     const messageEl = document.getElementById("message");
     const soundBtn = document.getElementById("soundBtn");
+    const endingOverlay = document.getElementById("endingOverlay");
+    const replayEndingBtn = document.getElementById("replayEndingBtn");
+    const restartFromEndingBtn = document.getElementById("restartFromEndingBtn");
 
     const COLS = 10;
     const ROWS = 20;
@@ -722,6 +976,12 @@
       dropInterval = LEVEL_SPEEDS[level];
     }
 
+    function showEndingScene() {
+      endingOverlay.classList.remove("show");
+      void endingOverlay.offsetWidth;
+      endingOverlay.classList.add("show");
+    }
+
     function clearLines() {
       let lines = 0;
 
@@ -747,8 +1007,10 @@
 
         if (level >= MAX_LEVEL && totalLines >= (MAX_LEVEL - 1) * LINES_PER_LEVEL) {
           gameWon = true;
+          piece = null;
           messageEl.textContent = "พิชิตด่าน 23 สำเร็จ";
           playImpact("win");
+          setTimeout(showEndingScene, 500);
         }
       }
     }
@@ -817,6 +1079,7 @@
     }
 
     function restartGame() {
+      endingOverlay.classList.remove("show");
       board = createBoard();
       piece = null;
       score = 0;
@@ -839,6 +1102,10 @@
 
     document.addEventListener("keydown", (e) => {
       ensureAudio();
+      if (endingOverlay.classList.contains("show") && e.key === "Escape") {
+        endingOverlay.classList.remove("show");
+        return;
+      }
       if (e.key === "ArrowLeft") moveLeft();
       else if (e.key === "ArrowRight") moveRight();
       else if (e.key === "ArrowDown") moveDown();
@@ -868,6 +1135,22 @@
     document.getElementById("restartBtn").addEventListener("click", () => {
       ensureAudio();
       restartGame();
+    });
+
+    replayEndingBtn.addEventListener("click", () => {
+      ensureAudio();
+      showEndingScene();
+    });
+
+    restartFromEndingBtn.addEventListener("click", () => {
+      ensureAudio();
+      restartGame();
+    });
+
+    endingOverlay.addEventListener("click", (e) => {
+      if (e.target === endingOverlay) {
+        endingOverlay.classList.remove("show");
+      }
     });
 
     soundBtn.addEventListener("click", () => {
