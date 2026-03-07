@@ -10,13 +10,32 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    :root {
+      --bg: #0d0d0f;
+      --panel: #17171b;
+      --panel-2: #202028;
+      --line: #34343d;
+      --cement-1: #2a2a31;
+      --cement-2: #3a3a42;
+      --cement-3: #4a4a54;
+      --text: #f1f1f1;
+      --muted: #b3b3bb;
+      --steel: #5d5d67;
+      --steel-dark: #292931;
+      --glow: rgba(255,255,255,0.08);
+    }
+
     html, body {
       margin: 0;
       padding: 0;
-      background: #0d0d10;
-      color: #f2f2f2;
-      font-family: Arial, sans-serif;
       min-height: 100%;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255,255,255,0.03), transparent 20%),
+        radial-gradient(circle at 80% 25%, rgba(255,255,255,0.02), transparent 18%),
+        radial-gradient(circle at 30% 75%, rgba(255,255,255,0.02), transparent 22%),
+        linear-gradient(180deg, #0d0d0f 0%, #0a0a0d 100%);
+      color: var(--text);
+      font-family: Arial, sans-serif;
     }
 
     body {
@@ -28,23 +47,55 @@
 
     .wrap {
       width: 100%;
-      max-width: 380px;
+      max-width: 390px;
       text-align: center;
     }
 
     h1 {
-      margin: 4px 0 10px;
-      font-size: 26px;
+      margin: 2px 0 10px;
+      font-size: 28px;
+      font-weight: 800;
       letter-spacing: 0.5px;
-      font-weight: 700;
+      color: #f4f4f4;
+      text-shadow:
+        0 0 0 rgba(0,0,0,0),
+        0 2px 0 rgba(255,255,255,0.04),
+        0 8px 18px rgba(0,0,0,0.45);
     }
 
     .panel {
-      background: linear-gradient(180deg, #1a1a1d, #111114);
-      border: 1px solid #2f2f34;
-      border-radius: 18px;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.03), rgba(0,0,0,0.08)),
+        repeating-linear-gradient(
+          135deg,
+          rgba(255,255,255,0.012) 0px,
+          rgba(255,255,255,0.012) 2px,
+          rgba(0,0,0,0.012) 2px,
+          rgba(0,0,0,0.012) 6px
+        ),
+        linear-gradient(180deg, #19191e 0%, #121217 100%);
+      border: 1px solid #2f2f37;
+      border-radius: 22px;
       padding: 12px;
-      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        inset 0 -1px 0 rgba(0,0,0,0.3),
+        0 12px 28px rgba(0,0,0,0.38);
+    }
+
+    .panel::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255,255,255,0.025) 0 2px, transparent 3px),
+        radial-gradient(circle at 78% 28%, rgba(255,255,255,0.02) 0 2px, transparent 3px),
+        radial-gradient(circle at 28% 72%, rgba(255,255,255,0.02) 0 2px, transparent 3px),
+        radial-gradient(circle at 62% 82%, rgba(255,255,255,0.015) 0 1.5px, transparent 2.5px);
+      opacity: 0.65;
     }
 
     .topbar {
@@ -55,21 +106,35 @@
 
     .info {
       flex: 1;
-      background: #18181c;
-      border: 1px solid #2b2b31;
-      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06)),
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,0.01) 0px,
+          rgba(255,255,255,0.01) 1px,
+          rgba(0,0,0,0.01) 1px,
+          rgba(0,0,0,0.01) 5px
+        ),
+        linear-gradient(180deg, #1b1b21, #15151a);
+      border: 1px solid #2f2f37;
+      border-radius: 14px;
       padding: 8px;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.035),
+        inset 0 -1px 0 rgba(0,0,0,0.25);
     }
 
     .label {
       font-size: 11px;
-      color: #a7a7b0;
+      color: var(--muted);
       margin-bottom: 4px;
     }
 
     .value {
       font-size: 18px;
-      font-weight: bold;
+      font-weight: 800;
       color: #ffffff;
     }
 
@@ -84,12 +149,16 @@
       width: min(100%, 280px);
       height: auto;
       max-height: 54vh;
-      background: #202025;
-      border: 2px solid #3a3a40;
-      border-radius: 12px;
       display: block;
       margin: 0 auto;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.03);
+      border-radius: 16px;
+      border: 3px solid #4b4b55;
+      background:
+        linear-gradient(180deg, #2a2a31 0%, #222229 100%);
+      box-shadow:
+        inset 0 0 0 2px rgba(255,255,255,0.03),
+        inset 0 0 40px rgba(0,0,0,0.18),
+        0 10px 24px rgba(0,0,0,0.32);
     }
 
     .gameover {
@@ -108,53 +177,86 @@
     }
 
     button {
-      border: none;
-      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #44444e;
+      border-radius: 14px;
       padding: 12px 8px;
-      background: #34343a;
-      color: #ffffff;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.08)),
+        repeating-linear-gradient(
+          135deg,
+          rgba(255,255,255,0.01) 0px,
+          rgba(255,255,255,0.01) 3px,
+          rgba(0,0,0,0.015) 3px,
+          rgba(0,0,0,0.015) 7px
+        ),
+        linear-gradient(180deg, #3d3d46, #2f2f37);
+      color: #f7f7f7;
       font-size: 15px;
-      font-weight: bold;
+      font-weight: 800;
       cursor: pointer;
-      box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        inset 0 -1px 0 rgba(0,0,0,0.35),
+        0 4px 12px rgba(0,0,0,0.18);
+    }
+
+    button::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,0.04), transparent 25%),
+        radial-gradient(circle at 80% 75%, rgba(0,0,0,0.09), transparent 25%);
+      pointer-events: none;
     }
 
     button:active {
-      transform: scale(0.98);
+      transform: scale(0.985);
     }
 
     .wide {
       grid-column: span 3;
-      background: #43434b;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(0,0,0,0.1)),
+        repeating-linear-gradient(
+          135deg,
+          rgba(255,255,255,0.012) 0px,
+          rgba(255,255,255,0.012) 3px,
+          rgba(0,0,0,0.015) 3px,
+          rgba(0,0,0,0.015) 8px
+        ),
+        linear-gradient(180deg, #50505a, #3e3e47);
+    }
+
+    .toggle-row {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .sound-btn {
+      flex: 1;
+      padding: 10px 8px;
+      font-size: 14px;
     }
 
     .help {
       margin-top: 10px;
-      color: #9a9aa3;
+      color: #9f9fa8;
       font-size: 12px;
       line-height: 1.4;
     }
 
     @media (max-height: 740px) {
       h1 {
-        font-size: 24px;
+        font-size: 25px;
         margin: 2px 0 8px;
       }
 
       .panel {
         padding: 10px;
-      }
-
-      .topbar {
-        margin-bottom: 8px;
-      }
-
-      .info {
-        padding: 7px;
-      }
-
-      .value {
-        font-size: 17px;
       }
 
       canvas {
@@ -209,6 +311,10 @@
         <button class="wide" id="restartBtn">เริ่มใหม่</button>
       </div>
 
+      <div class="toggle-row">
+        <button class="sound-btn" id="soundBtn">🔊 เสียง: เปิด</button>
+      </div>
+
       <div class="help">
         คีย์บอร์ด: ← → ขยับ, ↑ หมุน, ↓ ลงเร็ว
       </div>
@@ -222,19 +328,20 @@
     const scoreEl = document.getElementById("score");
     const statusEl = document.getElementById("status");
     const messageEl = document.getElementById("message");
+    const soundBtn = document.getElementById("soundBtn");
 
     const COLS = 10;
     const ROWS = 20;
     const BLOCK = 30;
 
     const COLORS = {
-      1: "#e7e7e7",
-      2: "#d5d5d5",
-      3: "#c2c2c2",
-      4: "#afafaf",
-      5: "#9c9c9c",
-      6: "#898989",
-      7: "#f4f4f4"
+      1: "#d9d9d9",
+      2: "#c9c9c9",
+      3: "#b6b6b6",
+      4: "#a4a4a4",
+      5: "#939393",
+      6: "#828282",
+      7: "#ececec"
     };
 
     const SHAPES = [
@@ -254,6 +361,146 @@
     let dropCounter;
     let dropInterval;
     let lastTime;
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          audioCtx = new AudioContextClass();
+        }
+      }
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+    }
+
+    function noiseBuffer(duration = 0.08) {
+      const sampleRate = audioCtx.sampleRate;
+      const buffer = audioCtx.createBuffer(1, sampleRate * duration, sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      return buffer;
+    }
+
+    function playImpact(type = "move") {
+      if (!soundEnabled) return;
+      ensureAudio();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+
+      if (type === "move") {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const filter = audioCtx.createBiquadFilter();
+
+        osc.type = "square";
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(120, now + 0.05);
+
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(500, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.05, now + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.07);
+      }
+
+      if (type === "rotate") {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(240, now);
+        osc.frequency.exponentialRampToValueAtTime(320, now + 0.04);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.045, now + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.08);
+      }
+
+      if (type === "drop" || type === "clear" || type === "gameover") {
+        const source = audioCtx.createBufferSource();
+        const buffer = noiseBuffer(type === "gameover" ? 0.22 : 0.10);
+        const filter = audioCtx.createBiquadFilter();
+        const gain = audioCtx.createGain();
+
+        source.buffer = buffer;
+
+        if (type === "drop") {
+          filter.type = "bandpass";
+          filter.frequency.setValueAtTime(180, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(0.14, now + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
+        }
+
+        if (type === "clear") {
+          filter.type = "bandpass";
+          filter.frequency.setValueAtTime(400, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(0.16, now + 0.008);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+
+          const osc = audioCtx.createOscillator();
+          const oscGain = audioCtx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.exponentialRampToValueAtTime(420, now + 0.1);
+          oscGain.gain.setValueAtTime(0.0001, now);
+          oscGain.gain.exponentialRampToValueAtTime(0.04, now + 0.01);
+          oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.11);
+          osc.connect(oscGain);
+          oscGain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        }
+
+        if (type === "gameover") {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(160, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(0.18, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.2);
+
+          const osc = audioCtx.createOscillator();
+          const oscGain = audioCtx.createGain();
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(130, now);
+          osc.frequency.exponentialRampToValueAtTime(70, now + 0.18);
+          oscGain.gain.setValueAtTime(0.0001, now);
+          oscGain.gain.exponentialRampToValueAtTime(0.05, now + 0.02);
+          oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+          osc.connect(oscGain);
+          oscGain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        }
+
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        source.start(now);
+      }
+    }
 
     function createBoard() {
       return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
@@ -269,21 +516,56 @@
     }
 
     function drawCell(x, y, value) {
-      ctx.fillStyle = COLORS[value] || "#ffffff";
-      ctx.fillRect(x * BLOCK, y * BLOCK, BLOCK - 1, BLOCK - 1);
+      const px = x * BLOCK;
+      const py = y * BLOCK;
+
+      const grad = ctx.createLinearGradient(px, py, px + BLOCK, py + BLOCK);
+      grad.addColorStop(0, lighten(COLORS[value], 22));
+      grad.addColorStop(0.45, COLORS[value]);
+      grad.addColorStop(1, darken(COLORS[value], 28));
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(px, py, BLOCK - 1, BLOCK - 1);
+
+      ctx.fillStyle = "rgba(255,255,255,0.08)";
+      ctx.fillRect(px + 3, py + 3, BLOCK - 10, 4);
+
+      ctx.strokeStyle = "rgba(0,0,0,0.22)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(px + 0.5, py + 0.5, BLOCK - 2, BLOCK - 2);
+
+      ctx.fillStyle = "rgba(255,255,255,0.015)";
+      for (let i = 0; i < 10; i++) {
+        const rx = px + Math.random() * (BLOCK - 4) + 2;
+        const ry = py + Math.random() * (BLOCK - 4) + 2;
+        ctx.fillRect(rx, ry, 1.4, 1.4);
+      }
     }
 
     function drawBoard() {
-      ctx.fillStyle = "#202025";
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bgGrad.addColorStop(0, "#2a2a31");
+      bgGrad.addColorStop(1, "#212128");
+      ctx.fillStyle = bgGrad;
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       for (let y = 0; y < ROWS; y++) {
         for (let x = 0; x < COLS; x++) {
+          const px = x * BLOCK;
+          const py = y * BLOCK;
+
           if (board[y][x]) {
             drawCell(x, y, board[y][x]);
           } else {
-            ctx.fillStyle = "#27272d";
-            ctx.fillRect(x * BLOCK, y * BLOCK, BLOCK - 1, BLOCK - 1);
+            ctx.fillStyle = "#2a2a31";
+            ctx.fillRect(px, py, BLOCK - 1, BLOCK - 1);
+
+            ctx.strokeStyle = "rgba(0,0,0,0.16)";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(px + 0.5, py + 0.5, BLOCK - 2, BLOCK - 2);
+
+            ctx.fillStyle = "rgba(255,255,255,0.01)";
+            ctx.fillRect(px + 2, py + 2, BLOCK - 8, 2);
           }
         }
       }
@@ -292,18 +574,14 @@
     function drawPiece() {
       piece.shape.forEach((row, y) => {
         row.forEach((value, x) => {
-          if (value) {
-            drawCell(piece.x + x, piece.y + y, value);
-          }
+          if (value) drawCell(piece.x + x, piece.y + y, value);
         });
       });
     }
 
     function draw() {
       drawBoard();
-      if (!gameOver || piece) {
-        drawPiece();
-      }
+      if (piece) drawPiece();
     }
 
     function collide() {
@@ -356,10 +634,12 @@
           if (collide()) {
             piece.x = oldX;
             piece.shape = oldShape;
+            return;
           }
         }
       }
 
+      playImpact("rotate");
       draw();
     }
 
@@ -383,6 +663,7 @@
       if (lines > 0) {
         score += lines * 100;
         scoreEl.textContent = score;
+        playImpact("clear");
       }
     }
 
@@ -393,6 +674,7 @@
         gameOver = true;
         statusEl.textContent = "จบเกม";
         messageEl.textContent = "Game Over";
+        playImpact("gameover");
       }
     }
 
@@ -404,6 +686,7 @@
       if (collide()) {
         piece.y--;
         merge();
+        playImpact("drop");
         clearLines();
         spawnPiece();
       }
@@ -414,17 +697,23 @@
 
     function moveLeft() {
       if (gameOver) return;
-
       piece.x--;
-      if (collide()) piece.x++;
+      if (collide()) {
+        piece.x++;
+      } else {
+        playImpact("move");
+      }
       draw();
     }
 
     function moveRight() {
       if (gameOver) return;
-
       piece.x++;
-      if (collide()) piece.x--;
+      if (collide()) {
+        piece.x--;
+      } else {
+        playImpact("move");
+      }
       draw();
     }
 
@@ -455,18 +744,83 @@
       draw();
     }
 
+    function lighten(hex, amt) {
+      const {r, g, b} = hexToRgb(hex);
+      return rgbToHex(
+        clamp(r + amt, 0, 255),
+        clamp(g + amt, 0, 255),
+        clamp(b + amt, 0, 255)
+      );
+    }
+
+    function darken(hex, amt) {
+      const {r, g, b} = hexToRgb(hex);
+      return rgbToHex(
+        clamp(r - amt, 0, 255),
+        clamp(g - amt, 0, 255),
+        clamp(b - amt, 0, 255)
+      );
+    }
+
+    function hexToRgb(hex) {
+      const clean = hex.replace("#", "");
+      const bigint = parseInt(clean, 16);
+      return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255
+      };
+    }
+
+    function rgbToHex(r, g, b) {
+      return "#" + [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("");
+    }
+
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
+
     document.addEventListener("keydown", (e) => {
+      ensureAudio();
       if (e.key === "ArrowLeft") moveLeft();
       else if (e.key === "ArrowRight") moveRight();
       else if (e.key === "ArrowDown") moveDown();
       else if (e.key === "ArrowUp") rotatePiece();
     });
 
-    document.getElementById("leftBtn").addEventListener("click", moveLeft);
-    document.getElementById("rightBtn").addEventListener("click", moveRight);
-    document.getElementById("downBtn").addEventListener("click", moveDown);
-    document.getElementById("rotateBtn").addEventListener("click", rotatePiece);
-    document.getElementById("restartBtn").addEventListener("click", restartGame);
+    document.getElementById("leftBtn").addEventListener("click", () => {
+      ensureAudio();
+      moveLeft();
+    });
+
+    document.getElementById("rightBtn").addEventListener("click", () => {
+      ensureAudio();
+      moveRight();
+    });
+
+    document.getElementById("downBtn").addEventListener("click", () => {
+      ensureAudio();
+      moveDown();
+    });
+
+    document.getElementById("rotateBtn").addEventListener("click", () => {
+      ensureAudio();
+      rotatePiece();
+    });
+
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      ensureAudio();
+      restartGame();
+    });
+
+    soundBtn.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      soundBtn.textContent = soundEnabled ? "🔊 เสียง: เปิด" : "🔇 เสียง: ปิด";
+      if (soundEnabled) ensureAudio();
+    });
+
+    document.body.addEventListener("touchstart", ensureAudio, { passive: true, once: true });
+    document.body.addEventListener("click", ensureAudio, { once: true });
 
     restartGame();
     update();
