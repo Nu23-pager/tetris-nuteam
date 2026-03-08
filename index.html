@@ -1,466 +1,1716 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Tetris Nuteam</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    :root {
+      --bg1: #0b0b0d;
+      --bg2: #111115;
+      --text: #f3f3f3;
+      --muted: #a7a7b0;
+    }
 
-<title>Tetris Nuteam</title>
+    html, body {
+      margin: 0;
+      padding: 0;
+      min-height: 100%;
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255,255,255,0.03), transparent 18%),
+        radial-gradient(circle at 82% 22%, rgba(255,255,255,0.02), transparent 20%),
+        radial-gradient(circle at 28% 80%, rgba(255,255,255,0.02), transparent 18%),
+        linear-gradient(180deg, var(--bg2) 0%, var(--bg1) 100%);
+    }
 
-<style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px 10px 18px;
+    }
 
-body{
-margin:0;
-background:#111;
-color:white;
-font-family:Arial;
-text-align:center;
-overflow:hidden;
-}
+    .wrap {
+      width: 100%;
+      max-width: 390px;
+      text-align: center;
+      position: relative;
+    }
 
-canvas{
-background:#222;
-display:block;
-margin:auto;
-border:3px solid #555;
-}
+    h1 {
+      margin: 2px 0 10px;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      color: #f6f6f6;
+      text-shadow:
+        0 2px 0 rgba(255,255,255,0.05),
+        0 8px 18px rgba(0,0,0,0.45);
+    }
 
-button{
-padding:12px;
-margin:8px;
-border:none;
-border-radius:8px;
-background:#444;
-color:white;
-font-weight:bold;
-}
+    .panel,
+    .modal-card {
+      position: relative;
+      overflow: hidden;
+      border-radius: 22px;
+      padding: 12px;
+      border: 1px solid #2e2e36;
+      background:
+        repeating-linear-gradient(
+          125deg,
+          rgba(255,255,255,0.015) 0px,
+          rgba(255,255,255,0.015) 4px,
+          rgba(0,0,0,0.015) 4px,
+          rgba(0,0,0,0.015) 10px
+        ),
+        linear-gradient(180deg, #19191f 0%, #111116 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.04),
+        inset 0 -1px 0 rgba(0,0,0,0.28),
+        0 14px 30px rgba(0,0,0,0.38);
+    }
 
-input{
-padding:10px;
-border-radius:8px;
-border:none;
-margin:10px;
-text-align:center;
-}
+    .panel::before,
+    .modal-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 10% 15%, rgba(255,255,255,0.02) 0 2px, transparent 2.5px),
+        radial-gradient(circle at 80% 28%, rgba(255,255,255,0.018) 0 2px, transparent 3px),
+        radial-gradient(circle at 26% 78%, rgba(255,255,255,0.02) 0 1.5px, transparent 2.5px),
+        linear-gradient(180deg, rgba(255,255,255,0.015), transparent 30%);
+      opacity: 0.8;
+    }
 
-.start-screen{
+    .topbar {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
 
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
+    .info {
+      position: relative;
+      overflow: hidden;
+      border-radius: 14px;
+      padding: 8px;
+      border: 1px solid #2f2f37;
+      background:
+        repeating-linear-gradient(
+          90deg,
+          rgba(255,255,255,0.01) 0px,
+          rgba(255,255,255,0.01) 2px,
+          rgba(0,0,0,0.01) 2px,
+          rgba(0,0,0,0.01) 6px
+        ),
+        linear-gradient(180deg, #1b1b21, #15151a);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.035),
+        inset 0 -1px 0 rgba(0,0,0,0.25);
+    }
 
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
+    .label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
 
-background:#1a1a1a;
-}
+    .value {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+    }
 
-.logo-area{
+    .canvas-wrap {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0 auto;
+      position: relative;
+    }
 
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
+    canvas#game {
+      width: min(100%, 280px);
+      height: auto;
+      max-height: 54vh;
+      display: block;
+      margin: 0 auto;
+      border-radius: 18px;
+      border: 3px solid #555560;
+      background: linear-gradient(180deg, #2a2a31 0%, #202027 100%);
+      box-shadow:
+        inset 0 0 0 2px rgba(255,255,255,0.03),
+        inset 0 0 40px rgba(0,0,0,0.22),
+        0 10px 24px rgba(0,0,0,0.32);
+    }
 
-width:320px;
-margin-bottom:30px;
+    .message {
+      margin-top: 8px;
+      min-height: 22px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+    }
 
-}
+    .controls {
+      margin-top: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
 
-.logo-block{
+    button,
+    .file-label {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #484851;
+      border-radius: 14px;
+      padding: 12px 8px;
+      background:
+        repeating-linear-gradient(
+          135deg,
+          rgba(255,255,255,0.015) 0px,
+          rgba(255,255,255,0.015) 4px,
+          rgba(0,0,0,0.015) 4px,
+          rgba(0,0,0,0.015) 10px
+        ),
+        linear-gradient(180deg, #4b4b55, #34343d);
+      color: #f7f7f7;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        inset 0 -1px 0 rgba(0,0,0,0.35),
+        0 4px 12px rgba(0,0,0,0.18);
+    }
 
-width:40px;
-height:40px;
-margin:2px;
+    button:active,
+    .file-label:active {
+      transform: scale(0.985);
+    }
 
-display:flex;
-align-items:center;
-justify-content:center;
+    .wide {
+      grid-column: span 3;
+      background:
+        repeating-linear-gradient(
+          135deg,
+          rgba(255,255,255,0.018) 0px,
+          rgba(255,255,255,0.018) 4px,
+          rgba(0,0,0,0.018) 4px,
+          rgba(0,0,0,0.018) 10px
+        ),
+        linear-gradient(180deg, #575761, #3e3e47);
+    }
 
-font-weight:bold;
-background:#555;
+    .toggle-row,
+    .extra-row,
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
 
-transform:translateY(-200px);
-animation:drop 0.6s forwards;
+    .sound-btn,
+    .extra-row button,
+    .modal-actions button,
+    .file-label {
+      flex: 1;
+      padding: 10px 8px;
+      font-size: 14px;
+    }
 
-}
+    .help {
+      margin-top: 10px;
+      color: #9d9da7;
+      font-size: 12px;
+      line-height: 1.4;
+    }
 
-@keyframes drop{
+    .overlay,
+    .ending-overlay {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, rgba(255,255,255,0.04), rgba(0,0,0,0.75) 45%, rgba(0,0,0,0.93) 100%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 60;
+    }
 
-0%{transform:translateY(-200px)}
+    .overlay.show,
+    .ending-overlay.show {
+      display: flex;
+      animation: fadeIn 0.45s ease;
+    }
 
-80%{transform:translateY(10px)}
+    .modal-card,
+    .ending-card {
+      width: 100%;
+      max-width: 390px;
+      border-radius: 24px;
+      padding: 18px 16px 16px;
+    }
 
-100%{transform:translateY(0)}
+    .modal-title,
+    .ending-title {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      text-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    }
 
-}
+    .modal-sub,
+    .ending-sub {
+      color: #ccccd3;
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 14px;
+    }
 
-.wall{
+    .wall-list {
+      display: grid;
+      gap: 10px;
+      margin: 12px 0 14px;
+      max-height: 52vh;
+      overflow: auto;
+      padding-right: 2px;
+    }
 
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
+    .wall-brick {
+      text-align: left;
+      border-radius: 14px;
+      border: 1px solid #4a4a53;
+      padding: 12px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.08)),
+        repeating-linear-gradient(
+          135deg,
+          rgba(255,255,255,0.014) 0px,
+          rgba(255,255,255,0.014) 4px,
+          rgba(0,0,0,0.014) 4px,
+          rgba(0,0,0,0.014) 10px
+        ),
+        linear-gradient(180deg, #3e3e46, #2e2e35);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.05),
+        0 4px 12px rgba(0,0,0,0.22);
+    }
 
-background:#111;
+    .wall-rank {
+      font-size: 13px;
+      color: #c8c8cf;
+      margin-bottom: 3px;
+    }
 
-display:none;
-overflow:auto;
+    .wall-name {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+    }
 
-}
+    .wall-score {
+      font-size: 13px;
+      color: #d6d6dd;
+      margin-top: 4px;
+    }
 
-.brick{
+    .wall-date {
+      font-size: 11px;
+      color: #9d9da7;
+      margin-top: 5px;
+    }
 
-background:#444;
-padding:12px;
-margin:8px;
-border-radius:6px;
-font-weight:bold;
+    .crown {
+      display: inline-block;
+      margin-left: 6px;
+      font-size: 14px;
+    }
 
-}
+    .start-logo {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      width: 100%;
+      max-width: 330px;
+      margin: 4px auto 16px;
+    }
 
-</style>
+    .logo-block {
+      height: 42px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #ffffff;
+      background:
+        linear-gradient(180deg, #707078, #4d4d55);
+      border: 1px solid #2e2e36;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.06),
+        0 5px 10px rgba(0,0,0,0.22);
+      transform: translateY(-150px);
+      opacity: 0;
+      animation: logoDrop 0.55s cubic-bezier(.2,.8,.25,1) forwards;
+    }
 
+    .logo-spacer {
+      visibility: hidden;
+    }
+
+    @keyframes logoDrop {
+      0% { transform: translateY(-150px); opacity: 0; }
+      70% { transform: translateY(6px); opacity: 1; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+
+    .start-input {
+      width: 100%;
+      border: 1px solid #4a4a54;
+      border-radius: 14px;
+      padding: 14px 12px;
+      background: rgba(255,255,255,0.92);
+      color: #111;
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+      margin-top: 4px;
+    }
+
+    .start-caption {
+      color: #bdbdc5;
+      font-size: 13px;
+      margin: 12px 0 0;
+      line-height: 1.45;
+    }
+
+    .poster-preview {
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 1 / 1;
+      border-radius: 18px;
+      border: 1px solid #4a4a53;
+      overflow: hidden;
+      margin: 0 auto 14px;
+      background: #222;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.03),
+        0 10px 24px rgba(0,0,0,0.28);
+    }
+
+    .poster-preview canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .poster-note {
+      color: #bcbcc4;
+      font-size: 12px;
+      line-height: 1.45;
+      margin-top: 12px;
+    }
+
+    .ending-scene {
+      position: relative;
+      height: 280px;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 1px solid #4a4a53;
+      background:
+        linear-gradient(180deg, #1f1f26 0%, #141419 100%);
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,0.03),
+        inset 0 -40px 70px rgba(0,0,0,0.35);
+      margin-bottom: 14px;
+    }
+
+    .dust {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      filter: blur(6px);
+      animation: floatDust linear infinite;
+    }
+
+    .brick {
+      position: absolute;
+      width: 34px;
+      height: 18px;
+      border-radius: 4px;
+      background:
+        linear-gradient(180deg, #8c8c92, #68686f);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.08),
+        0 4px 10px rgba(0,0,0,0.3);
+      opacity: 0;
+      animation: brickRise 1s forwards;
+    }
+
+    .statue-placeholder {
+      position: absolute;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) scale(0.9);
+      width: 120px;
+      height: 190px;
+      opacity: 0;
+      animation: revealStatue 1.6s forwards 1.1s;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.4));
+    }
+
+    .pedestal {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 24px;
+      border-radius: 6px 6px 10px 10px;
+      background: linear-gradient(180deg, #8b8b92, #5d5d65);
+    }
+
+    .body-shape {
+      position: absolute;
+      left: 50%;
+      bottom: 20px;
+      transform: translateX(-50%);
+      width: 82px;
+      height: 150px;
+      background: linear-gradient(180deg, #d4d4d8, #8f8f95 70%, #77777f);
+      clip-path: polygon(
+        48% 0%, 60% 5%, 68% 16%, 66% 28%, 72% 36%, 74% 49%,
+        67% 61%, 67% 77%, 74% 100%, 57% 100%, 50% 82%, 43% 100%,
+        26% 100%, 34% 77%, 33% 61%, 26% 49%, 28% 36%, 34% 28%,
+        32% 16%, 40% 5%
+      );
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+
+    .crack-line {
+      position: absolute;
+      background: rgba(60,60,68,0.55);
+      border-radius: 4px;
+    }
+
+    .ending-note {
+      margin-top: 12px;
+      color: #bcbcc4;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    #posterCanvas,
+    #posterPreviewCanvas {
+      display: none;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes floatDust {
+      from {
+        transform: translateY(16px) translateX(0px);
+        opacity: 0;
+      }
+      20% { opacity: 0.8; }
+      to {
+        transform: translateY(-120px) translateX(18px);
+        opacity: 0;
+      }
+    }
+
+    @keyframes brickRise {
+      0% {
+        transform: translateY(30px) scale(0.8) rotate(8deg);
+        opacity: 0;
+      }
+      60% { opacity: 1; }
+      100% {
+        transform: translateY(0) scale(1) rotate(0deg);
+        opacity: 1;
+      }
+    }
+
+    @keyframes revealStatue {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.86);
+      }
+      60% { opacity: 1; }
+      100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+      }
+    }
+
+    @media (max-height: 740px) {
+      h1 {
+        font-size: 25px;
+        margin: 2px 0 8px;
+      }
+
+      .panel,
+      .modal-card,
+      .ending-card {
+        padding: 10px;
+      }
+
+      canvas#game {
+        width: min(100%, 260px);
+        max-height: 50vh;
+      }
+
+      button,
+      .file-label {
+        padding: 11px 8px;
+        font-size: 14px;
+      }
+
+      .controls {
+        gap: 7px;
+        margin-top: 10px;
+      }
+
+      .help {
+        font-size: 11px;
+        margin-top: 8px;
+      }
+
+      .ending-scene {
+        height: 250px;
+      }
+
+      .start-logo {
+        max-width: 300px;
+        gap: 5px;
+      }
+
+      .logo-block {
+        height: 38px;
+        font-size: 17px;
+      }
+    }
+  </style>
 </head>
-
 <body>
-
-<div id="startScreen" class="start-screen">
-
-<div id="logoArea" class="logo-area"></div>
-
-<input id="playerName" placeholder="Enter name">
-
-<button onclick="startGame()">START GAME</button>
-
-<button onclick="showWall()">WALL OF CONQUERORS</button>
-
-</div>
-
-<div id="wallScreen" class="wall">
-
-<h2>WALL OF CONQUERORS</h2>
-
-<div id="wallList"></div>
-
-<button onclick="closeWall()">BACK</button>
-
-</div>
-
-<canvas id="game" width="300" height="600"></canvas>
-
-<canvas id="posterCanvas" width="800" height="800" style="display:none"></canvas>
-
-<script>
-
-function buildLogo(){
-
-let text="TETRIS NUTEAM"
-
-let logo=document.getElementById("logoArea")
-
-text.split("").forEach((c,i)=>{
-
-let b=document.createElement("div")
-
-b.className="logo-block"
-
-b.style.animationDelay=(i*0.08)+"s"
-
-b.innerText=c
-
-logo.appendChild(b)
-
-})
-
-}
-
-buildLogo()
-
-let canvas=document.getElementById("game")
-
-let ctx=canvas.getContext("2d")
-
-let score=0
-
-let level=1
-
-let player=""
-
-const COLS=10
-
-const ROWS=20
-
-const SIZE=30
-
-let board=[]
-
-for(let r=0;r<ROWS;r++){
-
-board[r]=[]
-
-for(let c=0;c<COLS;c++){
-
-board[r][c]=0
-
-}
-
-}
-
-const pieces=[
-
-[[1,1,1,1]],
-
-[[1,1],[1,1]],
-
-[[0,1,0],[1,1,1]],
-
-[[1,1,0],[0,1,1]]
-
-]
-
-let piece
-
-function newPiece(){
-
-let shape=pieces[Math.floor(Math.random()*pieces.length)]
-
-piece={
-
-x:4,
-
-y:0,
-
-shape:shape
-
-}
-
-}
-
-function draw(){
-
-ctx.clearRect(0,0,canvas.width,canvas.height)
-
-for(let r=0;r<ROWS;r++){
-
-for(let c=0;c<COLS;c++){
-
-if(board[r][c]){
-
-ctx.fillStyle="#aaa"
-
-ctx.fillRect(c*SIZE,r*SIZE,SIZE,SIZE)
-
-}
-
-}
-
-}
-
-if(piece){
-
-piece.shape.forEach((row,y)=>{
-
-row.forEach((v,x)=>{
-
-if(v){
-
-ctx.fillStyle="#ddd"
-
-ctx.fillRect((piece.x+x)*SIZE,(piece.y+y)*SIZE,SIZE,SIZE)
-
-}
-
-})
-
-})
-
-}
-
-}
-
-function moveDown(){
-
-piece.y++
-
-if(collide()){
-
-piece.y--
-
-merge()
-
-newPiece()
-
-}
-
-draw()
-
-}
-
-function collide(){
-
-for(let y=0;y<piece.shape.length;y++){
-
-for(let x=0;x<piece.shape[y].length;x++){
-
-if(piece.shape[y][x]){
-
-let nx=piece.x+x
-
-let ny=piece.y+y
-
-if(nx<0||nx>=COLS||ny>=ROWS||board[ny][nx]){
-
-return true
-
-}
-
-}
-
-}
-
-}
-
-return false
-
-}
-
-function merge(){
-
-piece.shape.forEach((row,y)=>{
-
-row.forEach((v,x)=>{
-
-if(v){
-
-board[piece.y+y][piece.x+x]=1
-
-score+=10
-
-}
-
-})
-
-})
-
-}
-
-document.addEventListener("keydown",e=>{
-
-if(e.key=="ArrowLeft")piece.x--
-
-if(e.key=="ArrowRight")piece.x++
-
-if(e.key=="ArrowDown")moveDown()
-
-draw()
-
-})
-
-function loop(){
-
-moveDown()
-
-draw()
-
-setTimeout(loop,600-(level*20))
-
-}
-
-function startGame(){
-
-player=document.getElementById("playerName").value||"Player"
-
-document.getElementById("startScreen").style.display="none"
-
-newPiece()
-
-loop()
-
-}
-
-function saveConqueror(name){
-
-let data=JSON.parse(localStorage.getItem("nuteam_conquerors")||"[]")
-
-let rank=data.length+1
-
-data.push({rank:rank,name:name,score:score})
-
-localStorage.setItem("nuteam_conquerors",JSON.stringify(data))
-
-return rank
-
-}
-
-function showWall(){
-
-let data=JSON.parse(localStorage.getItem("nuteam_conquerors")||"[]")
-
-let html=""
-
-data.forEach(p=>{
-
-html+=`<div class="brick">#${p.rank} ${p.name}<br>${p.score} pts</div>`
-
-})
-
-document.getElementById("wallList").innerHTML=html
-
-document.getElementById("wallScreen").style.display="block"
-
-}
-
-function closeWall(){
-
-document.getElementById("wallScreen").style.display="none"
-
-}
-
-function sharePoster(){
-
-let canvas=document.getElementById("posterCanvas")
-
-let ctx=canvas.getContext("2d")
-
-ctx.fillStyle="#333"
-
-ctx.fillRect(0,0,800,800)
-
-ctx.fillStyle="white"
-
-ctx.textAlign="center"
-
-ctx.font="60px Arial"
-
-ctx.fillText("TETRIS NUTEAM",400,150)
-
-ctx.font="40px Arial"
-
-ctx.fillText(player,400,300)
-
-ctx.font="70px Arial"
-
-ctx.fillText(score+" pts",400,450)
-
-ctx.font="30px Arial"
-
-ctx.fillText("CAN YOU BEAT ME?",400,600)
-
-let link=document.createElement("a")
-
-link.download="score.png"
-
-link.href=canvas.toDataURL()
-
-link.click()
-
-}
-
-</script>
-
+  <div class="wrap">
+    <h1>Tetris Nuteam</h1>
+
+    <div class="panel">
+      <div class="topbar">
+        <div class="info">
+          <div class="label">คะแนน</div>
+          <div class="value" id="score">0</div>
+        </div>
+        <div class="info">
+          <div class="label">เลเวล</div>
+          <div class="value" id="level">1</div>
+        </div>
+        <div class="info">
+          <div class="label">แถว</div>
+          <div class="value" id="lines">0</div>
+        </div>
+      </div>
+
+      <div class="canvas-wrap">
+        <canvas id="game" width="300" height="600"></canvas>
+      </div>
+
+      <div class="message" id="message"></div>
+
+      <div class="controls">
+        <button id="leftBtn">◀ ซ้าย</button>
+        <button id="rotateBtn">⟳ หมุน</button>
+        <button id="rightBtn">ขวา ▶</button>
+        <button class="wide" id="downBtn">▼ ลงเร็ว</button>
+        <button class="wide" id="restartBtn">เริ่มใหม่</button>
+      </div>
+
+      <div class="toggle-row">
+        <button class="sound-btn" id="soundBtn">🔊 เสียง: เปิด</button>
+      </div>
+
+      <div class="extra-row">
+        <button id="wallBtn">Wall</button>
+        <button id="shareBtn">แชร์คะแนน</button>
+      </div>
+
+      <div class="help">
+        Level 1–23 • คีย์บอร์ด: ← → ขยับ, ↑ หมุน, ↓ ลงเร็ว
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay show" id="startOverlay">
+    <div class="modal-card">
+      <div class="start-logo" id="startLogo"></div>
+      <div class="modal-sub">ใส่ชื่อผู้เล่น แล้วก้าวเข้าสู่จักรวาล Tetris Nuteam</div>
+      <input class="start-input" id="playerNameInput" maxlength="20" placeholder="ชื่อผู้เล่น" />
+      <div class="modal-actions">
+        <button id="startGameBtn">START GAME</button>
+        <button id="openWallFromStartBtn">WALL</button>
+      </div>
+      <div class="start-caption">
+        ถ้าคุณแพ้ คุณยังแชร์คะแนนท้าเพื่อนได้<br>
+        ถ้าคุณชนะ ชื่อของคุณจะถูกจารึกไว้บนกำแพง
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="wallOverlay">
+    <div class="modal-card">
+      <div class="modal-title">Wall of Conquerors</div>
+      <div class="modal-sub">ผู้พิชิตด่าน 23 และคะแนนของพวกเขา</div>
+      <div class="wall-list" id="wallList"></div>
+      <div class="modal-actions">
+        <button id="closeWallBtn">ปิด</button>
+        <button id="clearWallBtn">ล้างกำแพง</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="posterOverlay">
+    <div class="modal-card">
+      <div class="modal-title" id="posterTitle">Poster</div>
+      <div class="modal-sub" id="posterSubtitle">สร้างภาพไว้ประกาศผล</div>
+
+      <div class="poster-preview">
+        <canvas id="posterPreviewCanvas" width="800" height="800"></canvas>
+      </div>
+
+      <input type="file" id="winnerImageInput" accept="image/*" />
+      <div class="modal-actions">
+        <label class="file-label" for="winnerImageInput">เลือกรูป</label>
+        <button id="downloadPosterBtn">ดาวน์โหลดภาพ</button>
+      </div>
+      <div class="modal-actions">
+        <button id="closePosterBtn">ปิด</button>
+      </div>
+
+      <div class="poster-note">
+        กรณีชนะด่านสุดท้าย คุณสามารถเลือกรูปใส่ลงในภาพชัยชนะได้<br>
+        แล้วแคปหรือดาวน์โหลดไปโพสต์ในโซเชี่ยล
+      </div>
+    </div>
+  </div>
+
+  <div class="ending-overlay" id="endingOverlay">
+    <div class="ending-card">
+      <div class="ending-title">ไซต์สุดท้ายถูกพิชิตแล้ว</div>
+      <div class="ending-sub">
+        เศษอิฐและฝุ่นจากสนามสุดท้ายกำลังก่อตัวเป็นผลงานปลายทางของผู้ชนะ
+      </div>
+
+      <div class="ending-scene" id="endingScene">
+        <div class="brick" style="left:18%; bottom:38px; animation-delay:0.1s;"></div>
+        <div class="brick" style="left:28%; bottom:60px; animation-delay:0.2s;"></div>
+        <div class="brick" style="left:38%; bottom:84px; animation-delay:0.35s;"></div>
+        <div class="brick" style="left:50%; bottom:108px; animation-delay:0.5s;"></div>
+        <div class="brick" style="left:61%; bottom:84px; animation-delay:0.7s;"></div>
+        <div class="brick" style="left:69%; bottom:58px; animation-delay:0.9s;"></div>
+
+        <div class="dust" style="width:46px;height:46px;left:18%;bottom:30px;animation-duration:4s;animation-delay:0.2s;"></div>
+        <div class="dust" style="width:30px;height:30px;left:28%;bottom:70px;animation-duration:3.5s;animation-delay:0.9s;"></div>
+        <div class="dust" style="width:38px;height:38px;left:58%;bottom:50px;animation-duration:4.2s;animation-delay:0.6s;"></div>
+        <div class="dust" style="width:24px;height:24px;left:72%;bottom:92px;animation-duration:3.2s;animation-delay:1.1s;"></div>
+        <div class="dust" style="width:34px;height:34px;left:44%;bottom:120px;animation-duration:3.7s;animation-delay:1.4s;"></div>
+
+        <div class="statue-placeholder">
+          <div class="body-shape"></div>
+          <div class="pedestal"></div>
+          <div class="crack-line" style="left:50%; top:36px; width:3px; height:90px; transform:rotate(8deg);"></div>
+          <div class="crack-line" style="left:40%; top:88px; width:26px; height:3px; transform:rotate(-24deg);"></div>
+          <div class="crack-line" style="left:57%; top:104px; width:22px; height:3px; transform:rotate(28deg);"></div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button id="shareVictoryBtn">สร้างภาพชัยชนะ</button>
+        <button id="restartFromEndingBtn">เริ่มใหม่</button>
+      </div>
+
+      <div class="ending-note">
+        ตอนนี้เป็นฉากจบต้นแบบก่อน ขั้นถัดไปเราค่อยเลือกว่าจะเปลี่ยนเป็นประติมากรรมแบบใด
+      </div>
+    </div>
+  </div>
+
+  <canvas id="posterCanvas" width="800" height="800"></canvas>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    const scoreEl = document.getElementById("score");
+    const levelEl = document.getElementById("level");
+    const linesEl = document.getElementById("lines");
+    const messageEl = document.getElementById("message");
+    const soundBtn = document.getElementById("soundBtn");
+
+    const startOverlay = document.getElementById("startOverlay");
+    const wallOverlay = document.getElementById("wallOverlay");
+    const posterOverlay = document.getElementById("posterOverlay");
+    const endingOverlay = document.getElementById("endingOverlay");
+
+    const startGameBtn = document.getElementById("startGameBtn");
+    const openWallFromStartBtn = document.getElementById("openWallFromStartBtn");
+    const closeWallBtn = document.getElementById("closeWallBtn");
+    const clearWallBtn = document.getElementById("clearWallBtn");
+    const wallBtn = document.getElementById("wallBtn");
+    const shareBtn = document.getElementById("shareBtn");
+
+    const restartFromEndingBtn = document.getElementById("restartFromEndingBtn");
+    const shareVictoryBtn = document.getElementById("shareVictoryBtn");
+
+    const closePosterBtn = document.getElementById("closePosterBtn");
+    const downloadPosterBtn = document.getElementById("downloadPosterBtn");
+    const winnerImageInput = document.getElementById("winnerImageInput");
+    const posterTitle = document.getElementById("posterTitle");
+    const posterSubtitle = document.getElementById("posterSubtitle");
+
+    const posterCanvas = document.getElementById("posterCanvas");
+    const posterCtx = posterCanvas.getContext("2d");
+    const posterPreviewCanvas = document.getElementById("posterPreviewCanvas");
+    const posterPreviewCtx = posterPreviewCanvas.getContext("2d");
+
+    const playerNameInput = document.getElementById("playerNameInput");
+    const wallList = document.getElementById("wallList");
+    const startLogo = document.getElementById("startLogo");
+
+    const COLS = 10;
+    const ROWS = 20;
+    const BLOCK = 30;
+    const MAX_LEVEL = 23;
+    const LINES_PER_LEVEL = 5;
+    const STORAGE_KEY = "tetris_nuteam_conquerors_v1";
+
+    const LEVEL_SPEEDS = [
+      0,
+      900, 820, 750, 690, 630, 570, 520, 470, 430, 390, 350,
+      320, 290, 260, 230, 205, 180, 160, 140, 120, 105, 92, 80
+    ];
+
+    const COLORS = {
+      1: "#d6d6d6",
+      2: "#c5c5c5",
+      3: "#b4b4b4",
+      4: "#a4a4a4",
+      5: "#949494",
+      6: "#858585",
+      7: "#ececec"
+    };
+
+    const SHAPES = [
+      [[1,1,1,1]],
+      [[2,2],[2,2]],
+      [[0,3,0],[3,3,3]],
+      [[0,4,4],[4,4,0]],
+      [[5,5,0],[0,5,5]],
+      [[6,0,0],[6,6,6]],
+      [[0,0,7],[7,7,7]]
+    ];
+
+    let board;
+    let piece;
+    let score;
+    let level;
+    let totalLines;
+    let gameOver;
+    let gameWon;
+    let gameStarted = false;
+    let dropCounter;
+    let dropInterval;
+    let lastTime;
+    let soundEnabled = true;
+    let audioCtx = null;
+    let currentPlayerName = "";
+    let currentConquerorRank = null;
+    let currentPosterType = "score";
+    let winnerImage = null;
+
+    function buildStartLogo() {
+      startLogo.innerHTML = "";
+      const letters = ["T","E","T","R","I","S","", "N","U","T","E","A","M",""];
+      letters.forEach((char, i) => {
+        const block = document.createElement("div");
+        block.className = "logo-block" + (char === "" ? " logo-spacer" : "");
+        block.style.animationDelay = `${i * 0.07}s`;
+        block.textContent = char;
+        startLogo.appendChild(block);
+      });
+    }
+
+    function ensureAudio() {
+      if (!audioCtx) {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (AC) audioCtx = new AC();
+      }
+      if (audioCtx && audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+    }
+
+    function noiseBuffer(duration = 0.1) {
+      const sr = audioCtx.sampleRate;
+      const buffer = audioCtx.createBuffer(1, sr * duration, sr);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < data.length; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+      return buffer;
+    }
+
+    function playImpact(type = "move") {
+      if (!soundEnabled) return;
+      ensureAudio();
+      if (!audioCtx) return;
+
+      const now = audioCtx.currentTime;
+
+      if (type === "move") {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const filter = audioCtx.createBiquadFilter();
+
+        osc.type = "square";
+        osc.frequency.setValueAtTime(140, now);
+        osc.frequency.exponentialRampToValueAtTime(95, now + 0.06);
+
+        filter.type = "lowpass";
+        filter.frequency.setValueAtTime(380, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.12, now + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.085);
+      }
+
+      if (type === "rotate") {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        const filter = audioCtx.createBiquadFilter();
+
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(260, now + 0.05);
+
+        filter.type = "bandpass";
+        filter.frequency.setValueAtTime(500, now);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.11, now + 0.004);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.09);
+      }
+
+      if (type === "drop" || type === "clear" || type === "gameover" || type === "win") {
+        const source = audioCtx.createBufferSource();
+        const buffer = noiseBuffer(type === "gameover" ? 0.28 : type === "win" ? 0.18 : 0.12);
+        const filter = audioCtx.createBiquadFilter();
+        const gain = audioCtx.createGain();
+
+        source.buffer = buffer;
+
+        if (type === "drop") {
+          filter.type = "bandpass";
+          filter.frequency.setValueAtTime(130, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(0.28, now + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14);
+
+          const osc = audioCtx.createOscillator();
+          const oscGain = audioCtx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(90, now);
+          osc.frequency.exponentialRampToValueAtTime(60, now + 0.1);
+          oscGain.gain.setValueAtTime(0.0001, now);
+          oscGain.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
+          oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+          osc.connect(oscGain);
+          oscGain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.12);
+        }
+
+        if (type === "clear") {
+          filter.type = "bandpass";
+          filter.frequency.setValueAtTime(280, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(0.26, now + 0.008);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.15);
+
+          const osc = audioCtx.createOscillator();
+          const oscGain = audioCtx.createGain();
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(170, now);
+          osc.frequency.exponentialRampToValueAtTime(390, now + 0.12);
+          oscGain.gain.setValueAtTime(0.0001, now);
+          oscGain.gain.exponentialRampToValueAtTime(0.08, now + 0.01);
+          oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.13);
+          osc.connect(oscGain);
+          oscGain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.14);
+        }
+
+        if (type === "gameover") {
+          filter.type = "lowpass";
+          filter.frequency.setValueAtTime(140, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(0.3, now + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.26);
+
+          const osc = audioCtx.createOscillator();
+          const oscGain = audioCtx.createGain();
+          osc.type = "sawtooth";
+          osc.frequency.setValueAtTime(110, now);
+          osc.frequency.exponentialRampToValueAtTime(55, now + 0.22);
+          oscGain.gain.setValueAtTime(0.0001, now);
+          oscGain.gain.exponentialRampToValueAtTime(0.08, now + 0.02);
+          oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.22);
+          osc.connect(oscGain);
+          oscGain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.24);
+        }
+
+        if (type === "win") {
+          filter.type = "bandpass";
+          filter.frequency.setValueAtTime(420, now);
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(0.22, now + 0.01);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.16);
+
+          [280, 360, 480].forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const oscGain = audioCtx.createGain();
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(freq, now + i * 0.03);
+            oscGain.gain.setValueAtTime(0.0001, now + i * 0.03);
+            oscGain.gain.exponentialRampToValueAtTime(0.05, now + 0.04 + i * 0.03);
+            oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.14 + i * 0.03);
+            osc.connect(oscGain);
+            oscGain.connect(audioCtx.destination);
+            osc.start(now + i * 0.03);
+            osc.stop(now + 0.16 + i * 0.03);
+          });
+        }
+
+        source.connect(filter);
+        filter.connect(gain);
+        gain.connect(audioCtx.destination);
+        source.start(now);
+      }
+    }
+
+    function createBoard() {
+      return Array.from({ length: ROWS }, () => Array(COLS).fill(0));
+    }
+
+    function randomPiece() {
+      const shape = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+      return {
+        shape: shape.map(row => [...row]),
+        x: Math.floor(COLS / 2) - Math.ceil(shape[0].length / 2),
+        y: 0
+      };
+    }
+
+    function clamp(v, min, max) {
+      return Math.max(min, Math.min(max, v));
+    }
+
+    function hexToRgb(hex) {
+      const clean = hex.replace("#", "");
+      const bigint = parseInt(clean, 16);
+      return {
+        r: (bigint >> 16) & 255,
+        g: (bigint >> 8) & 255,
+        b: bigint & 255
+      };
+    }
+
+    function rgbToHex(r, g, b) {
+      return "#" + [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("");
+    }
+
+    function lighten(hex, amt) {
+      const { r, g, b } = hexToRgb(hex);
+      return rgbToHex(
+        clamp(r + amt, 0, 255),
+        clamp(g + amt, 0, 255),
+        clamp(b + amt, 0, 255)
+      );
+    }
+
+    function darken(hex, amt) {
+      const { r, g, b } = hexToRgb(hex);
+      return rgbToHex(
+        clamp(r - amt, 0, 255),
+        clamp(g - amt, 0, 255),
+        clamp(b - amt, 0, 255)
+      );
+    }
+
+    function drawCell(x, y, value) {
+      const px = x * BLOCK;
+      const py = y * BLOCK;
+
+      const grad = ctx.createLinearGradient(px, py, px + BLOCK, py + BLOCK);
+      grad.addColorStop(0, lighten(COLORS[value], 28));
+      grad.addColorStop(0.45, COLORS[value]);
+      grad.addColorStop(1, darken(COLORS[value], 34));
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(px, py, BLOCK - 1, BLOCK - 1);
+
+      ctx.fillStyle = "rgba(255,255,255,0.1)";
+      ctx.fillRect(px + 3, py + 3, BLOCK - 10, 3);
+
+      ctx.strokeStyle = "rgba(0,0,0,0.26)";
+      ctx.lineWidth = 1;
+      ctx.strokeRect(px + 0.5, py + 0.5, BLOCK - 2, BLOCK - 2);
+
+      ctx.fillStyle = "rgba(255,255,255,0.02)";
+      for (let i = 0; i < 6; i++) {
+        const rx = px + ((i * 5 + x * 3 + y * 2) % (BLOCK - 6)) + 2;
+        const ry = py + ((i * 7 + x * 2 + y * 5) % (BLOCK - 6)) + 2;
+        ctx.fillRect(rx, ry, 1.2, 1.2);
+      }
+    }
+
+    function drawBoard() {
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      bgGrad.addColorStop(0, "#2a2a31");
+      bgGrad.addColorStop(1, "#202027");
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          const px = x * BLOCK;
+          const py = y * BLOCK;
+
+          if (board[y][x]) {
+            drawCell(x, y, board[y][x]);
+          } else {
+            ctx.fillStyle = "#2a2a31";
+            ctx.fillRect(px, py, BLOCK - 1, BLOCK - 1);
+
+            ctx.strokeStyle = "rgba(0,0,0,0.16)";
+            ctx.lineWidth = 1;
+            ctx.strokeRect(px + 0.5, py + 0.5, BLOCK - 2, BLOCK - 2);
+
+            ctx.fillStyle = "rgba(255,255,255,0.012)";
+            ctx.fillRect(px + 2, py + 2, BLOCK - 8, 2);
+          }
+        }
+      }
+    }
+
+    function drawPiece() {
+      if (!piece) return;
+      piece.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value) drawCell(piece.x + x, piece.y + y, value);
+        });
+      });
+    }
+
+    function draw() {
+      drawBoard();
+      drawPiece();
+    }
+
+    function collide() {
+      for (let y = 0; y < piece.shape.length; y++) {
+        for (let x = 0; x < piece.shape[y].length; x++) {
+          if (!piece.shape[y][x]) continue;
+
+          const newX = piece.x + x;
+          const newY = piece.y + y;
+
+          if (
+            newX < 0 ||
+            newX >= COLS ||
+            newY >= ROWS ||
+            (newY >= 0 && board[newY][newX] !== 0)
+          ) return true;
+        }
+      }
+      return false;
+    }
+
+    function merge() {
+      piece.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+          if (value) board[piece.y + y][piece.x + x] = value;
+        });
+      });
+    }
+
+    function rotate(matrix) {
+      return matrix[0].map((_, i) => matrix.map(row => row[i]).reverse());
+    }
+
+    function rotatePiece() {
+      if (!gameStarted || gameOver || gameWon || anyOverlayOpen()) return;
+
+      const oldShape = piece.shape;
+      const oldX = piece.x;
+
+      piece.shape = rotate(piece.shape);
+
+      if (collide()) {
+        piece.x++;
+        if (collide()) {
+          piece.x -= 2;
+          if (collide()) {
+            piece.x = oldX;
+            piece.shape = oldShape;
+            return;
+          }
+        }
+      }
+
+      playImpact("rotate");
+      draw();
+    }
+
+    function updateLevel() {
+      const newLevel = Math.min(MAX_LEVEL, Math.floor(totalLines / LINES_PER_LEVEL) + 1);
+      if (newLevel !== level) {
+        level = newLevel;
+        levelEl.textContent = level;
+      }
+      dropInterval = LEVEL_SPEEDS[level];
+    }
+
+    function showEndingScene() {
+      endingOverlay.classList.remove("show");
+      void endingOverlay.offsetWidth;
+      endingOverlay.classList.add("show");
+    }
+
+    function clearLines() {
+      let lines = 0;
+
+      outer:
+      for (let y = ROWS - 1; y >= 0; y--) {
+        for (let x = 0; x < COLS; x++) {
+          if (board[y][x] === 0) continue outer;
+        }
+
+        const row = board.splice(y, 1)[0].fill(0);
+        board.unshift(row);
+        lines++;
+        y++;
+      }
+
+      if (lines > 0) {
+        totalLines += lines;
+        score += lines * 100 * level;
+        linesEl.textContent = totalLines;
+        scoreEl.textContent = score;
+        updateLevel();
+        playImpact("clear");
+
+        if (level >= MAX_LEVEL && totalLines >= (MAX_LEVEL - 1) * LINES_PER_LEVEL) {
+          gameWon = true;
+          piece = null;
+          currentConquerorRank = saveConqueror(currentPlayerName, score);
+          messageEl.textContent = "พิชิตด่าน 23 สำเร็จ";
+          playImpact("win");
+          setTimeout(showEndingScene, 500);
+        }
+      }
+    }
+
+    function spawnPiece() {
+      if (gameWon) return;
+      piece = randomPiece();
+
+      if (collide()) {
+        gameOver = true;
+        messageEl.textContent = "Game Over";
+        playImpact("gameover");
+      }
+    }
+
+    function moveDown() {
+      if (!gameStarted || gameOver || gameWon || anyOverlayOpen()) return;
+
+      piece.y++;
+
+      if (collide()) {
+        piece.y--;
+        merge();
+        playImpact("drop");
+        clearLines();
+        spawnPiece();
+      }
+
+      dropCounter = 0;
+      draw();
+    }
+
+    function moveLeft() {
+      if (!gameStarted || gameOver || gameWon || anyOverlayOpen()) return;
+      piece.x--;
+      if (collide()) {
+        piece.x++;
+      } else {
+        playImpact("move");
+      }
+      draw();
+    }
+
+    function moveRight() {
+      if (!gameStarted || gameOver || gameWon || anyOverlayOpen()) return;
+      piece.x++;
+      if (collide()) {
+        piece.x--;
+      } else {
+        playImpact("move");
+      }
+      draw();
+    }
+
+    function anyOverlayOpen() {
+      return startOverlay.classList.contains("show") ||
+             wallOverlay.classList.contains("show") ||
+             posterOverlay.classList.contains("show") ||
+             endingOverlay.classList.contains("show");
+    }
+
+    function update(time = 0) {
+      const delta = time - lastTime;
+      lastTime = time;
+      dropCounter += delta;
+
+      if (gameStarted && !gameOver && !gameWon && !anyOverlayOpen() && dropCounter > dropInterval) {
+        moveDown();
+      }
+
+      draw();
+      requestAnimationFrame(update);
+    }
+
+    function restartGame() {
+      board = createBoard();
+      piece = null;
+      score = 0;
+      level = 1;
+      totalLines = 0;
+      gameOver = false;
+      gameWon = false;
+      dropCounter = 0;
+      dropInterval = LEVEL_SPEEDS[1];
+      lastTime = 0;
+      currentConquerorRank = null;
+      winnerImage = null;
+      winnerImageInput.value = "";
+
+      scoreEl.textContent = "0";
+      levelEl.textContent = "1";
+      linesEl.textContent = "0";
+      messageEl.textContent = "";
+
+      spawnPiece();
+      draw();
+    }
+
+    function startGame() {
+      const name = playerNameInput.value.trim();
+      currentPlayerName = name || "Player";
+      startOverlay.classList.remove("show");
+      gameStarted = true;
+      restartGame();
+      ensureAudio();
+    }
+
+    function getConquerors() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+      } catch {
+        return [];
+      }
+    }
+
+    function setConquerors(list) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    }
+
+    function saveConqueror(name, scoreValue) {
+      const list = getConquerors();
+      const rank = list.length + 1;
+      list.push({
+        rank,
+        name,
+        score: scoreValue,
+        date: new Date().toLocaleString("th-TH")
+      });
+      setConquerors(list);
+      return rank;
+    }
+
+    function renderWall() {
+      const list = getConquerors();
+
+      if (list.length === 0) {
+        wallList.innerHTML = `
+          <div class="wall-brick">
+            <div class="wall-name">ยังไม่มีผู้พิชิต</div>
+            <div class="wall-score">กำแพงนี้กำลังรอชื่อแรก</div>
+          </div>
+        `;
+        return;
+      }
+
+      const topScore = Math.max(...list.map(item => item.score));
+      wallList.innerHTML = list.map(item => `
+        <div class="wall-brick">
+          <div class="wall-rank">#${item.rank}${item.rank === 1 ? '<span class="crown">👑 First Conqueror</span>' : ''}${item.score === topScore ? '<span class="crown">🏆 High Score</span>' : ''}</div>
+          <div class="wall-name">${escapeHtml(item.name)}</div>
+          <div class="wall-score">${item.score.toLocaleString()} pts</div>
+          <div class="wall-date">${escapeHtml(item.date)}</div>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function openWall() {
+      renderWall();
+      wallOverlay.classList.add("show");
+    }
+
+    function closeWall() {
+      wallOverlay.classList.remove("show");
+    }
+
+    function drawConcretePosterBackground(ctx) {
+      ctx.clearRect(0, 0, 800, 800);
+
+      const grad = ctx.createLinearGradient(0, 0, 0, 800);
+      grad.addColorStop(0, "#2d2d33");
+      grad.addColorStop(1, "#17171c");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 800, 800);
+
+      ctx.fillStyle = "rgba(255,255,255,0.03)";
+      for (let i = 0; i < 1500; i++) {
+        const x = Math.random() * 800;
+        const y = Math.random() * 800;
+        const s = Math.random() * 2 + 0.6;
+        ctx.fillRect(x, y, s, s);
+      }
+
+      ctx.strokeStyle = "rgba(0,0,0,0.25)";
+      ctx.lineWidth = 2;
+      for (let i = 0; i < 8; i++) {
+        let x = Math.random() * 800;
+        let y = Math.random() * 800;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        for (let j = 0; j < 6; j++) {
+          x += Math.random() * 80 - 40;
+          y += Math.random() * 80 - 40;
+          ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = "rgba(255,255,255,0.06)";
+      ctx.fillRect(42, 42, 716, 6);
+      ctx.fillStyle = "rgba(255,255,255,0.025)";
+      ctx.fillRect(42, 60, 716, 1);
+      ctx.fillRect(42, 740, 716, 1);
+    }
+
+    function drawPosterBase(title, subtitle) {
+      drawConcretePosterBackground(posterCtx);
+
+      posterCtx.textAlign = "center";
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.font = "bold 56px Arial";
+      posterCtx.fillText("TETRIS NUTEAM", 400, 110);
+
+      posterCtx.font = "bold 30px Arial";
+      posterCtx.fillStyle = "#e5e5ea";
+      posterCtx.fillText(title, 400, 190);
+
+      posterCtx.font = "24px Arial";
+      posterCtx.fillStyle = "#cfcfd5";
+      posterCtx.fillText(subtitle, 400, 230);
+    }
+
+    function drawWinnerImageIfAny() {
+      if (!winnerImage) return;
+      posterCtx.save();
+      posterCtx.beginPath();
+      posterCtx.roundRect(250, 440, 300, 220, 22);
+      posterCtx.clip();
+      posterCtx.drawImage(winnerImage, 250, 440, 300, 220);
+      posterCtx.restore();
+
+      posterCtx.strokeStyle = "rgba(255,255,255,0.18)";
+      posterCtx.lineWidth = 3;
+      posterCtx.beginPath();
+      posterCtx.roundRect(250, 440, 300, 220, 22);
+      posterCtx.stroke();
+    }
+
+    function drawScorePoster() {
+      drawPosterBase("CHALLENGE POSTER", "ฉันทำได้เท่านี้แล้ว คุณล่ะ");
+
+      posterCtx.font = "bold 54px Arial";
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.fillText(currentPlayerName || "Player", 400, 320);
+
+      posterCtx.font = "bold 88px Arial";
+      posterCtx.fillText(`${score}`, 400, 430);
+
+      posterCtx.font = "bold 34px Arial";
+      posterCtx.fillStyle = "#dddddf";
+      posterCtx.fillText(`LEVEL ${level}`, 400, 500);
+
+      posterCtx.font = "bold 34px Arial";
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.fillText("CAN YOU BEAT ME?", 400, 600);
+
+      posterCtx.font = "24px Arial";
+      posterCtx.fillStyle = "#c8c8cf";
+      posterCtx.fillText("Tetris Nuteam Challenge", 400, 670);
+
+      syncPosterPreview();
+    }
+
+    function drawVictoryPoster() {
+      drawPosterBase("VICTORY POSTER", "ผู้พิชิตด่าน 23");
+
+      posterCtx.font = "bold 54px Arial";
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.fillText(currentPlayerName || "Player", 400, 300);
+
+      posterCtx.font = "bold 34px Arial";
+      posterCtx.fillStyle = "#e3e3e8";
+      posterCtx.fillText(`THE ${currentConquerorRank || "-"}th CONQUEROR`, 400, 360);
+
+      posterCtx.font = "bold 76px Arial";
+      posterCtx.fillStyle = "#ffffff";
+      posterCtx.fillText(`${score}`, 400, 470);
+
+      posterCtx.font = "bold 30px Arial";
+      posterCtx.fillStyle = "#dddddf";
+      posterCtx.fillText("LEVEL 23 CONQUERED", 400, 530);
+
+      drawWinnerImageIfAny();
+
+      posterCtx.font = "24px Arial";
+      posterCtx.fillStyle = "#c8c8cf";
+      posterCtx.fillText("Wall of Conquerors", 400, 710);
+
+      syncPosterPreview();
+    }
+
+    function syncPosterPreview() {
+      posterPreviewCtx.clearRect(0, 0, 800, 800);
+      posterPreviewCtx.drawImage(posterCanvas, 0, 0);
+      posterPreviewCanvas.style.display = "block";
+    }
+
+    function openPoster(type) {
+      currentPosterType = type;
+
+      if (type === "victory") {
+        posterTitle.textContent = "ภาพชัยชนะ";
+        posterSubtitle.textContent = "ประกาศการพิชิตด่าน 23";
+        drawVictoryPoster();
+      } else {
+        posterTitle.textContent = "ภาพท้าทายคะแนน";
+        posterSubtitle.textContent = "ประกาศคะแนนแล้วชวนคนอื่นมาลอง";
+        drawScorePoster();
+      }
+
+      posterOverlay.classList.add("show");
+    }
+
+    function closePoster() {
+      posterOverlay.classList.remove("show");
+    }
+
+    function downloadPoster() {
+      const link = document.createElement("a");
+      link.download = currentPosterType === "victory" ? "tetris-nuteam-victory.png" : "tetris-nuteam-score.png";
+      link.href = posterCanvas.toDataURL("image/png");
+      link.click();
+    }
+
+    function handleWinnerImage(file) {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const img = new Image();
+        img.onload = () => {
+          winnerImage = img;
+          if (currentPosterType === "victory") {
+            drawVictoryPoster();
+          }
+        };
+        img.src = reader.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.addEventListener("keydown", (e) => {
+      ensureAudio();
+
+      if (e.key === "Escape") {
+        if (posterOverlay.classList.contains("show")) closePoster();
+        else if (wallOverlay.classList.contains("show")) closeWall();
+        else if (endingOverlay.classList.contains("show")) endingOverlay.classList.remove("show");
+        return;
+      }
+
+      if (!gameStarted || anyOverlayOpen()) return;
+
+      if (e.key === "ArrowLeft") moveLeft();
+      else if (e.key === "ArrowRight") moveRight();
+      else if (e.key === "ArrowDown") moveDown();
+      else if (e.key === "ArrowUp") rotatePiece();
+    });
+
+    document.getElementById("leftBtn").addEventListener("click", () => {
+      ensureAudio();
+      moveLeft();
+    });
+
+    document.getElementById("rightBtn").addEventListener("click", () => {
+      ensureAudio();
+      moveRight();
+    });
+
+    document.getElementById("downBtn").addEventListener("click", () => {
+      ensureAudio();
+      moveDown();
+    });
+
+    document.getElementById("rotateBtn").addEventListener("click", () => {
+      ensureAudio();
+      rotatePiece();
+    });
+
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      ensureAudio();
+      if (!gameStarted) {
+        startOverlay.classList.add("show");
+      } else {
+        restartGame();
+      }
+    });
+
+    soundBtn.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      soundBtn.textContent = soundEnabled ? "🔊 เสียง: เปิด" : "🔇 เสียง: ปิด";
+      if (soundEnabled) ensureAudio();
+    });
+
+    startGameBtn.addEventListener("click", startGame);
+    playerNameInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") startGame();
+    });
+
+    openWallFromStartBtn.addEventListener("click", openWall);
+    wallBtn.addEventListener("click", openWall);
+    closeWallBtn.addEventListener("click", closeWall);
+
+    clearWallBtn.addEventListener("click", () => {
+      const ok = confirm("ล้างรายชื่อผู้พิชิตทั้งหมด?");
+      if (!ok) return;
+      localStorage.removeItem(STORAGE_KEY);
+      renderWall();
+    });
+
+    shareBtn.addEventListener("click", () => {
+      if (!gameStarted) return;
+      openPoster("score");
+    });
+
+    shareVictoryBtn.addEventListener("click", () => {
+      openPoster("victory");
+    });
+
+    restartFromEndingBtn.addEventListener("click", () => {
+      ensureAudio();
+      endingOverlay.classList.remove("show");
+      restartGame();
+    });
+
+    closePosterBtn.addEventListener("click", closePoster);
+    downloadPosterBtn.addEventListener("click", downloadPoster);
+
+    winnerImageInput.addEventListener("change", (e) => {
+      handleWinnerImage(e.target.files?.[0]);
+    });
+
+    wallOverlay.addEventListener("click", (e) => {
+      if (e.target === wallOverlay) closeWall();
+    });
+
+    posterOverlay.addEventListener("click", (e) => {
+      if (e.target === posterOverlay) closePoster();
+    });
+
+    endingOverlay.addEventListener("click", (e) => {
+      if (e.target === endingOverlay) endingOverlay.classList.remove("show");
+    });
+
+    document.body.addEventListener("touchstart", ensureAudio, { passive: true, once: true });
+    document.body.addEventListener("click", ensureAudio, { once: true });
+
+    buildStartLogo();
+    restartGame();
+    draw();
+    update();
+  </script>
 </body>
 </html>
